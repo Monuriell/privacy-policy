@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Калькулятор відсотка жиру</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+  <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+    <h1 class="text-2xl font-bold mb-4 text-center">Калькулятор відсотка жиру</h1>
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-gray-700">Стать</label>
+      <select id="gender" class="mt-1 block w-full p-2 border rounded">
+        <option value="male">Чоловік</option>
+        <option value="female">Жінка</option>
+      </select>
+    </div>
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-gray-700">Зріст (см)</label>
+      <input id="height" type="number" step="0.1" class="mt-1 block w-full p-2 border rounded" placeholder="Введіть зріст">
+    </div>
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-gray-700">Обхват талії (см)</label>
+      <input id="waist" type="number" step="0.1" class="mt-1 block w-full p-2 border rounded" placeholder="Введіть обхват талії">
+    </div>
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-gray-700">Обхват шиї (см)</label>
+      <input id="neck" type="number" step="0.1" class="mt-1 block w-full p-2 border rounded" placeholder="Введіть обхват шиї">
+    </div>
+    <div id="hipSection" class="mb-4 hidden">
+      <label class="block text-sm font-medium text-gray-700">Обхват стегон (см)</label>
+      <input id="hip" type="number" step="0.1" class="mt-1 block w-full p-2 border rounded" placeholder="Введіть обхват стегон">
+    </div>
+    <button id="calculate" class="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Обчислити</button>
+    <div id="result" class="mt-4 text-center"></div>
+  </div>
+
+  <script>
+    // Показати/приховати поле для стегон залежно від статі
+    document.getElementById('gender').addEventListener('change', function() {
+      const hipSection = document.getElementById('hipSection');
+      hipSection.classList.toggle('hidden', this.value === 'male');
+    });
+
+    // Функція розрахунку відсотка жиру за формулою Navy
+    function calculateBodyFat(gender, height, waist, neck, hip) {
+      let bodyFat;
+      if (gender === 'male') {
+        bodyFat = 495 / (1.0324 - 0.19077 * Math.log10(waist - neck) + 0.15456 * Math.log10(height)) - 450;
+      } else {
+        bodyFat = 495 / (1.29579 - 0.35004 * Math.log10(waist + hip - neck) + 0.22100 * Math.log10(height)) - 450;
+      }
+      return Math.round(bodyFat * 10) / 10; // Округляємо до 1 знака після коми
+    }
+
+    // Функція для визначення категорії відсотка жиру
+    function getBodyFatCategory(gender, bodyFat) {
+      if (bodyFat < 0) {
+        return '<p class="text-red-500">Помилка: від’ємне значення. Можливо, параметри введено некоректно!</p>';
+      }
+      if (gender === 'male') {
+        if (bodyFat < 6) {
+          return `<p class="text-red-500">Відсоток жиру: ${bodyFat}% (Небезпечно низький)</p>`;
+        } else if (bodyFat >= 6 && bodyFat <= 13) {
+          return `<p class="text-green-500">Відсоток жиру: ${bodyFat}% (У нормі)</p>`;
+        } else if (bodyFat > 13 && bodyFat <= 25) {
+          return `<p class="text-yellow-500">Відсоток жиру: ${bodyFat}% (Потрібно звернути увагу)</p>`;
+        } else {
+          return `<p class="text-red-500">Відсоток жиру: ${bodyFat}% (Небезпечно високий)</p>`;
+        }
+      } else {
+        if (bodyFat < 14) {
+          return `<p class="text-red-500">Відсоток жиру: ${bodyFat}% (Небезпечно низький)</p>`;
+        } else if (bodyFat >= 14 && bodyFat <= 20) {
+          return `<p class="text-green-500">Відсоток жиру: ${bodyFat}% (У нормі)</p>`;
+        } else if (bodyFat > 20 && bodyFat <= 31) {
+          return `<p class="text-yellow-500">Відсоток жиру: ${bodyFat}% (Потрібно звернути увагу)</p>`;
+        } else {
+          return `<p class="text-red-500">Відсоток жиру: ${bodyFat}% (Небезпечно високий)</p>`;
+        }
+      }
+    }
+
+    // Обробник кнопки
+    document.getElementById('calculate').addEventListener('click', function() {
+      const gender = document.getElementById('gender').value;
+      const height = parseFloat(document.getElementById('height').value);
+      const waist = parseFloat(document.getElementById('waist').value);
+      const neck = parseFloat(document.getElementById('neck').value);
+      const hip = parseFloat(document.getElementById('hip').value) || 0;
+
+      // Валідація
+      if (!height || !waist || !neck || (gender === 'female' && !hip)) {
+        document.getElementById('result').innerHTML = '<p class="text-red-500">Будь ласка, заповніть усі поля!</p>';
+        return;
+      }
+
+      const bodyFat = calculateBodyFat(gender, height, waist, neck, hip);
+      const resultMessage = getBodyFatCategory(gender, bodyFat);
+      document.getElementById('result').innerHTML = resultMessage;
+      
+      // Інтеграція з Telegram Web App
+      if (window.Telegram?.WebApp) {
+        window.Telegram.WebApp.sendData(JSON.stringify({
+          bodyFat: bodyFat,
+          gender: gender,
+          height: height,
+          waist: waist,
+          neck: neck,
+          hip: hip,
+          category: resultMessage
+        }));
+      }
+    });
+
+    // Ініціалізація Telegram Web App
+    if (window.Telegram?.WebApp) {
+      window.Telegram.WebApp.ready();
+      window.Telegram.WebApp.expand();
+    }
+  </script>
+</body>
+</html>
