@@ -36,17 +36,16 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      
-      margin-bottom: 1rem;
       transition: color 0.2s;
     }
     .btn-back:hover {
       color: #2563eb;
     }
     .btn-back svg {
-      width: 1.2em;
-      height: 1.2em;
+      width: 28px;
+      height: 28px;
       vertical-align: middle;
+      display: block;      
     }
     .gender-btn {
       flex: 1;
@@ -122,7 +121,7 @@
     }
   </style>
 </head>
-<body class="min-h-screen flex items-center justify-center">
+<body class="min-h-screen flex items-center justify-center" style="padding-top:30px; padding-bottom:30px;">
   <div id="mainMenu" class="w-full max-w-md flex flex-col gap-6 items-center px-2">
     <h1 class="text-3xl font-extrabold mb-2 text-center text-gray-800 drop-shadow">Fobosss</h1>
     <button onclick="showSection('calorieCounter')" class="w-full bg-white/60 text-blue-700 font-bold p-4 rounded-lg shadow hover:bg-white/80 transition">Лічильник калорій</button>
@@ -134,10 +133,12 @@
   <div id="calorieCounterSection" class="hidden w-full">
     <div class="w-full max-w-md mx-auto">
       <div class="flex items-center mb-4">
-        <button onclick="showMainMenu()" class="btn-back mr-2 flex-shrink-0">
-          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+        <button onclick="showMainMenu()" class="btn-back mr-2 flex-shrink-0 w-10 h-10 flex items-center justify-center p-0">
+          <svg class="w-7 h-7 leading-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+          </svg>
         </button>
-        <h2 class="text-2xl font-bold text-center flex-1">Лічильник калорій</h2>
+        <h2 class="text-2xl font-bold flex-1 text-right leading-none">Лічильник калорій</h2>
       </div>
       <div id="calorieList" class="mb-4"></div>
       <form id="addCalorieForm" class="flex flex-col gap-2 mb-4">
@@ -156,12 +157,12 @@
         </div>
         <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg">+</button>
       </form>
-      <div class="text-lg font-semibold mb-2">Всього: <span id="totalCalories">0</span> ккал</div>
+      <!--<div class="text-lg font-semibold mb-2">Всього: <span id="totalCalories">0</span> ккал</div>
       <div class="text-sm text-gray-700">
         Білки: <span id="totalProtein">0</span> г,
         Жири: <span id="totalFat">0</span> г,
         Вуглеводи: <span id="totalCarbs">0</span> г
-      </div>
+      </div>-->
     </div>
   </div>
 
@@ -169,10 +170,12 @@
   <div id="kbjuSection" class="hidden w-full">
     <div class="w-full max-w-md mx-auto">
       <div class="flex items-center mb-4">
-        <button onclick="showMainMenu()" class="btn-back mr-2 flex-shrink-0">
-          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+        <button onclick="showMainMenu()" class="btn-back mr-2 flex-shrink-0 w-10 h-10 flex items-center justify-center p-0">
+          <svg class="w-7 h-7 leading-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+          </svg>
         </button>
-        <h2 class="text-2xl font-bold text-center flex-1">Розрахунок КБЖУ</h2>
+        <h2 class="text-2xl font-bold flex-1 text-right leading-none">Розрахунок КБЖУ</h2>
       </div>
       <form id="kbjuForm" class="flex flex-col gap-3">
         <div>
@@ -234,10 +237,12 @@
   <div id="bodyFatSection" class="hidden w-full">
     <div class="w-full max-w-md mx-auto">
       <div class="flex items-center mb-4">
-        <button onclick="showMainMenu()" class="btn-back mr-2 flex-shrink-0">
-          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+        <button onclick="showMainMenu()" class="btn-back mr-2 flex-shrink-0 w-10 h-10 flex items-center justify-center p-0">
+          <svg class="w-7 h-7 leading-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+          </svg>
         </button>
-        <h2 class="text-2xl font-bold text-center flex-1">Відсоток підшкірного жиру</h2>
+        <h2 class="text-2xl font-bold flex-1 text-right leading-none">Відсоток жиру</h2>
       </div>
       <div class="mb-4">
         <label class="block text-sm font-medium text-gray-700 mb-2">Стать</label>
@@ -306,20 +311,81 @@
       if (calorieList.length === 0) {
         listDiv.innerHTML = '<div class="text-gray-500">Додайте продукти для підрахунку калорій.</div>';
       } else {
-        listDiv.innerHTML = calorieList.map((item, idx) =>
-          `<div class="flex flex-col sm:flex-row justify-between items-center mb-1 gap-1">
-            <span>
-              ${item.name} — <span class="font-semibold">${item.calories} ккал</span>
-              <span class="text-xs text-gray-500">(${item.weight}г, Б: ${item.protein}г, Ж: ${item.fat}г, В: ${item.carbs}г)</span>
-            </span>
-            <button onclick="removeCalorie(${idx})" class="text-red-500 hover:underline text-sm">Видалити</button>
-          </div>`
-        ).join('');
+        // Считаем суммы
+        const totalCalories = calorieList.reduce((sum, i) => sum + i.calories, 0);
+        const totalProtein = calorieList.reduce((sum, i) => sum + i.protein, 0);
+        const totalFat = calorieList.reduce((sum, i) => sum + i.fat, 0);
+        const totalCarbs = calorieList.reduce((sum, i) => sum + i.carbs, 0);
+
+        // Функция для форматирования: максимум 1 знак после запятой, но без лишнего нуля
+        function format1(x) {
+          return Number.isInteger(x) ? x : x.toFixed(1).replace(/\.0$/, '');
+        }
+
+        const totalProteinFixed = format1(totalProtein);
+        const totalFatFixed = format1(totalFat);
+        const totalCarbsFixed = format1(totalCarbs);
+        const totalCaloriesFixed = format1(totalCalories);
+
+        listDiv.innerHTML = `
+          <div class="flex justify-center">
+            <div class="backdrop-blur-md bg-white/40 border border-white/50 rounded-2xl shadow p-3 w-full max-w-xs mx-auto">
+              <div class="font-semibold mb-2 text-center text-blue-900">Ваші продукти</div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-xs text-left">
+                  <thead>
+                    <tr>
+                      <th class="p-1 border-b border-blue-100 font-semibold text-blue-900">Продукт</th>
+                      <th class="p-1 border-b border-blue-100 font-semibold text-blue-900 text-right">Вага, г</th>
+                      <th class="p-1 border-b border-blue-100 font-semibold text-blue-900 text-right">Б</th>
+                      <th class="p-1 border-b border-blue-100 font-semibold text-blue-900 text-right">Ж</th>
+                      <th class="p-1 border-b border-blue-100 font-semibold text-blue-900 text-right">В</th>
+                      <th class="p-1 border-b border-blue-100 font-semibold text-blue-900 text-right">Ккал</th>
+                      <th class="p-1 border-b border-blue-100"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${calorieList.map((item, idx) => `
+                      <tr>
+                        <td class="p-1 border-b border-blue-100">${item.name}</td>
+                        <td class="p-1 border-b border-blue-100 text-right">${item.weight}</td>
+                        <td class="p-1 border-b border-blue-100 text-right">${item.protein}</td>
+                        <td class="p-1 border-b border-blue-100 text-right">${item.fat}</td>
+                        <td class="p-1 border-b border-blue-100 text-right">${item.carbs}</td>
+                        <td class="p-1 border-b border-blue-100 text-right font-semibold">${item.calories}</td>
+                        <td class="p-1 border-b border-blue-100 text-right">
+                          <button onclick="removeCalorie(${idx})"
+                            class="btn-main p-1 text-sm flex items-center justify-center text-red-600 border-red-200 hover:bg-red-100"
+                            style="width:28px;height:28px;min-width:28px;min-height:28px;border-radius:0.5rem;background:rgba(255,255,255,0.8);"
+                            title="Видалити">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                          </button>
+                        </td>
+                      </tr>
+                    `).join('')}
+                    <tr>
+                      <td class="p-1 font-semibold text-blue-900">Всього:</td>
+                      <td class="p-1"></td>
+                      <td class="p-1 text-right font-semibold">${totalProteinFixed}</td>
+                      <td class="p-1 text-right font-semibold">${totalFatFixed}</td>
+                      <td class="p-1 text-right font-semibold">${totalCarbsFixed}</td>
+                      <td class="p-1 text-right font-semibold">${totalCaloriesFixed}</td>
+                      <td class="p-1"></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        `;
+        // Обновляем старые блоки для совместимости (если где-то используются)
+        document.getElementById('totalCalories').textContent = totalCaloriesFixed;
+        document.getElementById('totalProtein').textContent = totalProteinFixed;
+        document.getElementById('totalFat').textContent = totalFatFixed;
+        document.getElementById('totalCarbs').textContent = totalCarbsFixed;
       }
-      document.getElementById('totalCalories').textContent = calorieList.reduce((sum, i) => sum + i.calories, 0);
-      document.getElementById('totalProtein').textContent = calorieList.reduce((sum, i) => sum + i.protein, 0);
-      document.getElementById('totalFat').textContent = calorieList.reduce((sum, i) => sum + i.fat, 0);
-      document.getElementById('totalCarbs').textContent = calorieList.reduce((sum, i) => sum + i.carbs, 0);
     }
     function removeCalorie(idx) {
       calorieList.splice(idx, 1);
