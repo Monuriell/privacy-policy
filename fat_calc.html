@@ -3,11 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Калькулятор відсотка жиру</title>
+  <title>Fobosss</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    /* Анимированный градиентный фон */
     body {
       background: linear-gradient(-45deg, #a5b4fc, #f3e8ff, #f0abfc, #bae6fd, #c7d2fe, #f9fafb);
       background-size: 400% 400%;
@@ -20,167 +19,421 @@
       75% {background-position: 50% 0%;}
       100% {background-position: 0% 50%;}
     }
+    .btn-main {
+      background: rgba(255,255,255,0.8);
+      color: #2563eb;
+      font-weight: 600;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 2px 8px 0 rgba(0,0,0,0.04);
+      border: 1px solid #dbeafe;
+      transition: background 0.2s;
+    }
+    .btn-main:hover {
+      background: rgba(255,255,255,0.9);
+    }
+    .btn-back {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      
+      margin-bottom: 1rem;
+      transition: color 0.2s;
+    }
+    .btn-back:hover {
+      color: #2563eb;
+    }
+    .btn-back svg {
+      width: 1.2em;
+      height: 1.2em;
+      vertical-align: middle;
+    }
+    .gender-btn {
+      flex: 1;
+      padding: 0.5rem 0;
+      border-radius: 0.5rem;
+      border: 1px solid #ddd6fe;
+      font-weight: 600;
+      background: rgba(255,255,255,0.7);
+      color: #1e293b;
+      box-shadow: 0 1px 4px 0 rgba(0,0,0,0.04);
+      transition: background 0.2s, color 0.2s, border 0.2s;
+      outline: none;
+    }
+    .gender-btn.active {
+      background: #f3e8ff;
+      color: #a21caf;
+      border-color: #a21caf;
+      box-shadow: 0 0 0 2px #a21caf33;
+    }
+    .gender-btn.female.active {
+      background: #fdf2f8;
+      color: #be185d;
+      border-color: #be185d;
+      box-shadow: 0 0 0 2px #be185d33;
+    }
+    .gender-btn:not(.active):hover {
+      background: #f1f5f9;
+      color: #2563eb;
+    }
+    #hipSection {
+      transition: max-height 0.3s, opacity 0.3s;
+      overflow: hidden;
+    }
+    #hipSection.hidden {
+      max-height: 0;
+      opacity: 0;
+      pointer-events: none;
+      margin-bottom: 0 !important;
+    }
+    #hipSection:not(.hidden) {
+      max-height: 100px;
+      opacity: 1;
+      margin-bottom: 1rem;
+    }
   </style>
 </head>
 <body class="min-h-screen flex items-center justify-center">
-  <div class="backdrop-blur-lg bg-white/30 border border-white/40 shadow-2xl rounded-3xl p-8 w-full max-w-md"
-       style="box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);">
-    <h1 class="text-3xl font-extrabold mb-6 text-center text-gray-800 drop-shadow">Калькулятор відсотка жиру</h1>
-    <div class="mb-4">
-      <label class="block text-sm font-medium text-gray-700 mb-2">Стать</label>
-      <div id="genderBtns" class="flex gap-4">
-        <button type="button" id="maleBtn" data-gender="male"
-          class="flex-1 py-2 rounded-lg border border-white/50 bg-white/80 backdrop-blur font-semibold text-blue-900 shadow transition focus:outline-none focus:ring-2 focus:ring-blue-300 ring-4"
-        >Чоловік</button>
-        <button type="button" id="femaleBtn" data-gender="female"
-          class="flex-1 py-2 rounded-lg border border-white/50 bg-white/40 backdrop-blur font-semibold text-pink-700 shadow transition focus:outline-none focus:ring-2 focus:ring-pink-300"
-        >Жінка</button>
+  <div id="mainMenu" class="backdrop-blur-lg bg-white/30 border border-white/40 shadow-2xl rounded-3xl p-8 w-full max-w-md flex flex-col gap-6 items-center">
+    <h1 class="text-3xl font-extrabold mb-2 text-center text-gray-800 drop-shadow">Fobosss</h1>
+    <button onclick="showSection('calorieCounter')" class="w-full bg-white/60 text-blue-700 font-bold p-4 rounded-lg shadow hover:bg-white/80 transition">Лічильник калорій</button>
+    <button onclick="showSection('kbju')" class="w-full bg-white/60 text-purple-700 font-bold p-4 rounded-lg shadow hover:bg-white/80 transition">Розрахунок КБЖУ</button>
+    <button onclick="showSection('bodyFat')" class="w-full bg-white/60 text-pink-700 font-bold p-4 rounded-lg shadow hover:bg-white/80 transition">Відсоток підшкірного жиру</button>
+  </div>
+
+  <!-- Счетчик калорий -->
+  <div id="calorieCounterSection" class="hidden">
+    <div class="backdrop-blur-lg bg-white/30 border border-white/40 shadow-2xl rounded-3xl p-8 w-full min-w-[370px] max-w-md mx-auto">
+      <button onclick="showMainMenu()" class="btn-back">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+      </button>
+      <h2 class="text-2xl font-bold mb-4 text-center">Лічильник калорій</h2>
+      <div id="calorieList" class="mb-4"></div>
+      <form id="addCalorieForm" class="flex flex-col gap-2 mb-4">
+        <div class="flex gap-2">
+          <input id="foodName" type="text" placeholder="Продукт" class="flex-1 p-2 rounded-lg border border-white/50 bg-white/40 backdrop-blur focus:outline-none" required>
+          <input id="foodWeight" type="number" placeholder="г" class="w-20 p-2 rounded-lg border border-white/50 bg-white/40 backdrop-blur focus:outline-none" required>
+        </div>
+        <div>
+          <input id="foodProtein" type="number" step="0.1" placeholder="Білки (на 100г)" class="w-full p-2 rounded-lg border border-white/50 bg-white/40 backdrop-blur focus:outline-none" required>
+        </div>
+        <div>
+          <input id="foodFat" type="number" step="0.1" placeholder="Жири (на 100г)" class="w-full p-2 rounded-lg border border-white/50 bg-white/40 backdrop-blur focus:outline-none" required>
+        </div>
+        <div>
+          <input id="foodCarbs" type="number" step="0.1" placeholder="Вугл. (на 100г)" class="w-full p-2 rounded-lg border border-white/50 bg-white/40 backdrop-blur focus:outline-none" required>
+        </div>
+        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg">+</button>
+      </form>
+      <div class="text-lg font-semibold mb-2">Всього: <span id="totalCalories">0</span> ккал</div>
+      <div class="text-sm text-gray-700">
+        Білки: <span id="totalProtein">0</span> г,
+        Жири: <span id="totalFat">0</span> г,
+        Вуглеводи: <span id="totalCarbs">0</span> г
       </div>
-      <input type="hidden" id="gender" value="male">
     </div>
-    <div class="mb-4">
-      <label class="block text-sm font-medium text-gray-700">Вік (років)</label>
-      <input id="age" type="number" min="10" max="120" class="mt-1 block w-full p-2 border border-white/50 rounded-lg bg-white/40 backdrop-blur focus:outline-none focus:ring-2 focus:ring-blue-300" placeholder="Введіть вік">
+  </div>
+
+  <!-- КБЖУ -->
+  <div id="kbjuSection" class="hidden">
+    <div class="backdrop-blur-lg bg-white/30 border border-white/40 shadow-2xl rounded-3xl p-8 w-full min-w-[370px] max-w-md mx-auto">
+      <button onclick="showMainMenu()" class="btn-back">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+      </button>
+      <h2 class="text-2xl font-bold mb-4 text-center">Розрахунок КБЖУ</h2>
+      <form id="kbjuForm" class="flex flex-col gap-3">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Стать</label>
+          <div id="kbjuGenderBtns" class="flex gap-4">
+            <button type="button" id="kbjuMaleBtn" data-gender="male"
+              class="gender-btn"
+            >Чоловік</button>
+            <button type="button" id="kbjuFemaleBtn" data-gender="female"
+              class="gender-btn female"
+            >Жінка</button>
+          </div>
+          <input type="hidden" id="kbjuGender" value="male">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Вік (років)</label>
+          <input id="kbjuAge" type="number" min="10" max="120" class="w-full p-2 rounded-lg border border-white/50 bg-white/40 backdrop-blur focus:outline-none" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Вага (кг)</label>
+          <input id="kbjuWeight" type="number" step="0.1" class="w-full p-2 rounded-lg border border-white/50 bg-white/40 backdrop-blur focus:outline-none" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Зріст (см)</label>
+          <input id="kbjuHeight" type="number" step="0.1" class="w-full p-2 rounded-lg border border-white/50 bg-white/40 backdrop-blur focus:outline-none" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Відсоток підшкірного жиру</label>
+          <input id="kbjuFatPercent" type="number" step="0.1" min="0" max="70" class="w-full p-2 rounded-lg border border-white/50 bg-white/40 backdrop-blur focus:outline-none" placeholder="Наприклад, 18" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Рівень активності</label>
+          <div class="flex flex-col gap-2">
+            <input id="kbjuActivitySlider" type="range" min="0" max="2" step="1" value="0" class="w-full accent-blue-500 h-3 rounded-full bg-blue-100 appearance-none outline-none transition-all" style="background: linear-gradient(90deg, #3b82f6 0%, #a5b4fc 100%);">
+            <div class="flex justify-between text-xs text-gray-700 px-1">
+              <span data-value="1.375">Низька</span>
+              <span data-value="1.55">Середня</span>
+              <span data-value="1.725">Висока</span>
+            </div>
+          </div>
+          <input type="hidden" id="kbjuActivity" value="1.375">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Мета</label>
+          <div id="kbjuGoalBtns" class="flex flex-col gap-2">
+            <button type="button" class="kbju-goal-btn py-2 rounded-lg border border-white/50 bg-white/80 font-semibold text-blue-900 shadow transition" data-value="lose">Схуднення</button>
+            <button type="button" class="kbju-goal-btn py-2 rounded-lg border border-white/50 bg-white/40 font-semibold text-blue-700 shadow transition" data-value="gain">Набір ваги</button>
+            <button type="button" class="kbju-goal-btn py-2 rounded-lg border border-white/50 bg-white/40 font-semibold text-blue-700 shadow transition" data-value="recomp">Рекомпозиція</button>
+          </div>
+          <input type="hidden" id="kbjuGoal" value="lose">
+        </div>
+        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg w-full">Визначити КБЖУ</button>
+      </form>
+      <div id="kbjuResult" class="mt-4"></div>
     </div>
-    <div class="mb-4">
-      <label class="block text-sm font-medium text-gray-700">Вага (кг)</label>
-      <input id="weight" type="number" step="0.1" class="mt-1 block w-full p-2 border border-white/50 rounded-lg bg-white/40 backdrop-blur focus:outline-none focus:ring-2 focus:ring-blue-300" placeholder="Введіть вагу">
+  </div>
+
+  <!-- Процент жира -->
+  <div id="bodyFatSection" class="hidden">
+    <div class="backdrop-blur-lg bg-white/30 border border-white/40 shadow-2xl rounded-3xl p-8 w-full min-w-[370px] max-w-md mx-auto">
+      <button onclick="showMainMenu()" class="btn-back">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+      </button>
+      <h2 class="text-2xl font-bold mb-4 text-center">Відсоток підшкірного жиру</h2>
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Стать</label>
+        <div id="genderBtns" class="flex gap-4">
+          <button type="button" id="maleBtn" data-gender="male"
+            class="gender-btn active"
+          >Чоловік</button>
+          <button type="button" id="femaleBtn" data-gender="female"
+            class="gender-btn female"
+          >Жінка</button>
+        </div>
+        <input type="hidden" id="gender" value="male">
+      </div>
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700">Вік (років)</label>
+        <input id="age" type="number" min="10" max="120" class="mt-1 block w-full p-2 border border-white/50 rounded-lg bg-white/40 backdrop-blur focus:outline-none focus:ring-2 focus:ring-blue-300" placeholder="Введіть вік">
+      </div>
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700">Вага (кг)</label>
+        <input id="weight" type="number" step="0.1" class="mt-1 block w-full p-2 border border-white/50 rounded-lg bg-white/40 backdrop-blur focus:outline-none focus:ring-2 focus:ring-blue-300" placeholder="Введіть вагу">
+      </div>
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700">Зріст (см)</label>
+        <input id="height" type="number" step="0.1" class="mt-1 block w-full p-2 border border-white/50 rounded-lg bg-white/40 backdrop-blur focus:outline-none focus:ring-2 focus:ring-blue-300" placeholder="Введіть зріст">
+      </div>
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700">Обхват талії (см)</label>
+        <input id="waist" type="number" step="0.1" class="mt-1 block w-full p-2 border border-white/50 rounded-lg bg-white/40 backdrop-blur focus:outline-none focus:ring-2 focus:ring-blue-300" placeholder="Введіть обхват талії">
+      </div>
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700">Обхват шиї (см)</label>
+        <input id="neck" type="number" step="0.1" class="mt-1 block w-full p-2 border border-white/50 rounded-lg bg-white/40 backdrop-blur focus:outline-none focus:ring-2 focus:ring-blue-300" placeholder="Введіть обхват шиї">
+      </div>
+      <div id="hipSection" class="mb-4 hidden">
+        <label class="block text-sm font-medium text-gray-700">Обхват стегон (см)</label>
+        <input id="hip" type="number" step="0.1" class="mt-1 block w-full p-2 border border-white/50 rounded-lg bg-white/40 backdrop-blur focus:outline-none focus:ring-2 focus:ring-blue-300" placeholder="Введіть обхват стегон">
+      </div>
+      <button id="calculate" class="bg-blue-500 text-white px-4 py-2 rounded-lg w-full">Визначити % жиру</button>
+      <div id="result" class="mt-6 text-center"></div>
     </div>
-    <div class="mb-4">
-      <label class="block text-sm font-medium text-gray-700">Зріст (см)</label>
-      <input id="height" type="number" step="0.1" class="mt-1 block w-full p-2 border border-white/50 rounded-lg bg-white/40 backdrop-blur focus:outline-none focus:ring-2 focus:ring-blue-300" placeholder="Введіть зріст">
-    </div>
-    <div class="mb-4">
-      <label class="block text-sm font-medium text-gray-700">Обхват талії (см)</label>
-      <input id="waist" type="number" step="0.1" class="mt-1 block w-full p-2 border border-white/50 rounded-lg bg-white/40 backdrop-blur focus:outline-none focus:ring-2 focus:ring-blue-300" placeholder="Введіть обхват талії">
-    </div>
-    <div class="mb-4">
-      <label class="block text-sm font-medium text-gray-700">Обхват шиї (см)</label>
-      <input id="neck" type="number" step="0.1" class="mt-1 block w-full p-2 border border-white/50 rounded-lg bg-white/40 backdrop-blur focus:outline-none focus:ring-2 focus:ring-blue-300" placeholder="Введіть обхват шиї">
-    </div>
-    <div id="hipSection" class="mb-4 hidden">
-      <label class="block text-sm font-medium text-gray-700">Обхват стегон (см)</label>
-      <input id="hip" type="number" step="0.1" class="mt-1 block w-full p-2 border border-white/50 rounded-lg bg-white/40 backdrop-blur focus:outline-none focus:ring-2 focus:ring-blue-300" placeholder="Введіть обхват стегон">
-    </div>
-    <button id="calculate" class="w-full bg-white/60 text-blue-700 font-bold p-2 rounded-lg shadow hover:bg-white/80 transition">Обчислити</button>
-    <div id="result" class="mt-6 text-center"></div>
   </div>
 
   <script>
+    // --- Навигация ---
+    function showSection(section) {
+      document.getElementById('mainMenu').classList.add('hidden');
+      document.getElementById('calorieCounterSection').classList.add('hidden');
+      document.getElementById('kbjuSection').classList.add('hidden');
+      document.getElementById('bodyFatSection').classList.add('hidden');
+      if (section === 'calorieCounter') document.getElementById('calorieCounterSection').classList.remove('hidden');
+      if (section === 'kbju') document.getElementById('kbjuSection').classList.remove('hidden');
+      if (section === 'bodyFat') document.getElementById('bodyFatSection').classList.remove('hidden');
+    }
+    function showMainMenu() {
+      document.getElementById('mainMenu').classList.remove('hidden');
+      document.getElementById('calorieCounterSection').classList.add('hidden');
+      document.getElementById('kbjuSection').classList.add('hidden');
+      document.getElementById('bodyFatSection').classList.add('hidden');
+    }
+
+    // --- Счетчик калорий ---
+    let calorieList = [];
+    function renderCalorieList() {
+      const listDiv = document.getElementById('calorieList');
+      if (!listDiv) return;
+      if (calorieList.length === 0) {
+        listDiv.innerHTML = '<div class="text-gray-500">Додайте продукти для підрахунку калорій.</div>';
+      } else {
+        listDiv.innerHTML = calorieList.map((item, idx) =>
+          `<div class="flex flex-col sm:flex-row justify-between items-center mb-1 gap-1">
+            <span>
+              ${item.name} — <span class="font-semibold">${item.calories} ккал</span>
+              <span class="text-xs text-gray-500">(${item.weight}г, Б: ${item.protein}г, Ж: ${item.fat}г, В: ${item.carbs}г)</span>
+            </span>
+            <button onclick="removeCalorie(${idx})" class="text-red-500 hover:underline text-sm">Видалити</button>
+          </div>`
+        ).join('');
+      }
+      document.getElementById('totalCalories').textContent = calorieList.reduce((sum, i) => sum + i.calories, 0);
+      document.getElementById('totalProtein').textContent = calorieList.reduce((sum, i) => sum + i.protein, 0);
+      document.getElementById('totalFat').textContent = calorieList.reduce((sum, i) => sum + i.fat, 0);
+      document.getElementById('totalCarbs').textContent = calorieList.reduce((sum, i) => sum + i.carbs, 0);
+    }
+    function removeCalorie(idx) {
+      calorieList.splice(idx, 1);
+      renderCalorieList();
+    }
+    document.getElementById('addCalorieForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const name = document.getElementById('foodName').value.trim();
+      const weight = parseFloat(document.getElementById('foodWeight').value);
+      const protein100 = parseFloat(document.getElementById('foodProtein').value);
+      const fat100 = parseFloat(document.getElementById('foodFat').value);
+      const carbs100 = parseFloat(document.getElementById('foodCarbs').value);
+      if (name && weight > 0) {
+        // Пересчет на порцию
+        const protein = Math.round(protein100 * weight / 100 * 10) / 10;
+        const fat = Math.round(fat100 * weight / 100 * 10) / 10;
+        const carbs = Math.round(carbs100 * weight / 100 * 10) / 10;
+        // Калории считаем по формуле
+        const calories = Math.round(((protein100 * 4 + fat100 * 9 + carbs100 * 4) * weight) / 100);
+        calorieList.push({ name, weight, protein, fat, carbs, calories });
+        renderCalorieList();
+        this.reset();
+      }
+    });
+    renderCalorieList();
+
+    // --- КБЖУ ---
     // Кнопки выбора пола
-    function setGender(gender) {
-      document.getElementById('gender').value = gender;
-      document.getElementById('maleBtn').classList.toggle('ring-4', gender === 'male');
-      document.getElementById('maleBtn').classList.toggle('bg-white/80', gender === 'male');
-      document.getElementById('maleBtn').classList.toggle('text-blue-900', gender === 'male');
-      document.getElementById('maleBtn').classList.toggle('bg-white/40', gender !== 'male');
-      document.getElementById('maleBtn').classList.toggle('text-blue-700', gender !== 'male');
-      document.getElementById('femaleBtn').classList.toggle('ring-4', gender === 'female');
-      document.getElementById('femaleBtn').classList.toggle('bg-white/80', gender === 'female');
-      document.getElementById('femaleBtn').classList.toggle('text-pink-900', gender === 'female');
-      document.getElementById('femaleBtn').classList.toggle('bg-white/40', gender !== 'female');
-      document.getElementById('femaleBtn').classList.toggle('text-pink-700', gender !== 'female');
-      // Показать/скрыть поле бедер
-      document.getElementById('hipSection').classList.toggle('hidden', gender === 'male');
+    function setKbjuGender(gender) {
+      document.getElementById('kbjuGender').value = gender;
+      document.getElementById('kbjuMaleBtn').classList.toggle('active', gender === 'male');
+      document.getElementById('kbjuFemaleBtn').classList.toggle('active', gender === 'female');
     }
-    document.getElementById('maleBtn').addEventListener('click', () => setGender('male'));
-    document.getElementById('femaleBtn').addEventListener('click', () => setGender('female'));
-    setGender('male');
+    document.getElementById('kbjuMaleBtn').addEventListener('click', () => setKbjuGender('male'));
+    document.getElementById('kbjuFemaleBtn').addEventListener('click', () => setKbjuGender('female'));
+    setKbjuGender('male');
 
-    // Формула Navy (1)
-    function calculateBodyFatNavy(gender, height, waist, neck, hip) {
-      let bodyFat;
-      if (gender === 'male') {
-        bodyFat = 495 / (1.0324 - 0.19077 * Math.log10(waist - neck) + 0.15456 * Math.log10(height)) - 450;
-      } else {
-        bodyFat = 495 / (1.29579 - 0.35004 * Math.log10(waist + hip - neck) + 0.22100 * Math.log10(height)) - 450;
-      }
-      return Math.round(bodyFat * 10) / 10;
+    // Кнопки выбора целей (по одной в ряд, 3 значения)
+    document.querySelectorAll('.kbju-goal-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.getElementById('kbjuGoal').value = this.dataset.value;
+        document.querySelectorAll('.kbju-goal-btn').forEach(b => {
+          b.classList.remove('ring-4', 'bg-white/80', 'text-blue-900');
+          b.classList.add('bg-white/40', 'text-blue-700');
+        });
+        this.classList.add('ring-4', 'bg-white/80', 'text-blue-900');
+        this.classList.remove('bg-white/40', 'text-blue-700');
+      });
+    });
+    // По умолчанию подсветить первую (lose)
+    const firstGoalBtn = document.querySelector('.kbju-goal-btn[data-value="lose"]');
+    if (firstGoalBtn) {
+      firstGoalBtn.classList.add('ring-4', 'bg-white/80', 'text-blue-900');
     }
 
-    // Формула Deurenberg (4)
-    function calculateBodyFatDeurenberg(gender, weight, height, age) {
-      const bmi = weight / Math.pow(height / 100, 2);
-      const sex = gender === 'male' ? 1 : 0;
-      const bodyFat = (1.20 * bmi) + (0.23 * age) - (10.8 * sex) - 5.4;
-      return Math.round(bodyFat * 10) / 10;
-    }
-
-    // Категории (по Navy)
-    function getBodyFatCategory(gender, bodyFat) {
-      if (bodyFat < 0) {
-        return '<p class="text-red-500">Помилка: від’ємне значення. Можливо, параметри введено некоректно!</p>';
-      }
-      if (gender === 'male') {
-        if (bodyFat < 6) {
-          return `<p class="text-red-500">Відсоток жиру: ${bodyFat}% (Небезпечно низький)</p>`;
-        } else if (bodyFat >= 6 && bodyFat <= 13) {
-          return `<p class="text-green-500">Відсоток жиру: ${bodyFat}% (У нормі)</p>`;
-        } else if (bodyFat > 13 && bodyFat <= 25) {
-          return `<p class="text-yellow-500">Відсоток жиру: ${bodyFat}% (Потрібно звернути увагу)</p>`;
-        } else {
-          return `<p class="text-red-500">Відсоток жиру: ${bodyFat}% (Небезпечно високий)</p>`;
-        }
-      } else {
-        if (bodyFat < 14) {
-          return `<p class="text-red-500">Відсоток жиру: ${bodyFat}% (Небезпечно низький)</p>`;
-        } else if (bodyFat >= 14 && bodyFat <= 20) {
-          return `<p class="text-green-500">Відсоток жиру: ${bodyFat}% (У нормі)</p>`;
-        } else if (bodyFat > 20 && bodyFat <= 31) {
-          return `<p class="text-yellow-500">Відсоток жиру: ${bodyFat}% (Потрібно звернути увагу)</p>`;
-        } else {
-          return `<p class="text-red-500">Відсоток жиру: ${bodyFat}% (Небезпечно високий)</p>`;
-        }
-      }
-    }
-
-    document.getElementById('calculate').addEventListener('click', function() {
-      const gender = document.getElementById('gender').value;
-      const age = parseFloat(document.getElementById('age').value);
-      const weight = parseFloat(document.getElementById('weight').value);
-      const height = parseFloat(document.getElementById('height').value);
-      const waist = parseFloat(document.getElementById('waist').value);
-      const neck = parseFloat(document.getElementById('neck').value);
-      const hip = parseFloat(document.getElementById('hip').value) || 0;
-
-      // Валідація
-      if (!age || !weight || !height || !waist || !neck || (gender === 'female' && !hip)) {
-        document.getElementById('result').innerHTML = '<p class="text-red-500">Будь ласка, заповніть усі поля!</p>';
-        return;
-      }
-
-      // 1. Navy
-      const bodyFatNavy = calculateBodyFatNavy(gender, height, waist, neck, hip);
-      // 2. Deurenberg
-      const bodyFatDeurenberg = calculateBodyFatDeurenberg(gender, weight, height, age);
-
-      let resultHtml = `
-        <div class="mb-2">
-          <span class="font-semibold">Navy:</span> ${bodyFatNavy}%<br>
-          ${getBodyFatCategory(gender, bodyFatNavy)}
-        </div>
-        <div class="mb-2">
-          <span class="font-semibold">Deurenberg:</span> ${bodyFatDeurenberg}%<br>
-          ${getBodyFatCategory(gender, bodyFatDeurenberg)}
-        </div>
-      `;
-      document.getElementById('result').innerHTML = resultHtml;
-
-      // Інтеграція з Telegram Web App
-      if (window.Telegram?.WebApp) {
-        window.Telegram.WebApp.sendData(JSON.stringify({
-          navy: bodyFatNavy,
-          deurenberg: bodyFatDeurenberg,
-          gender, age, weight, height, waist, neck, hip
-        }));
+    // --- Ползунок активности (3 значения) ---
+    let kbjuActivitySlider = null;
+    let kbjuActivityHidden = null;
+    let activityValues = ["1.375", "1.55", "1.725"];
+    document.addEventListener('DOMContentLoaded', function() {
+      // Исправлено: элементы получаем только после загрузки DOM
+      kbjuActivitySlider = document.getElementById('kbjuActivitySlider');
+      kbjuActivityHidden = document.getElementById('kbjuActivity');
+      if (kbjuActivitySlider && kbjuActivityHidden) {
+        kbjuActivitySlider.addEventListener('input', function() {
+          kbjuActivityHidden.value = activityValues[this.value];
+          document.querySelectorAll('#kbjuSection .flex.justify-between span').forEach((el, idx) => {
+            if (idx == this.value) {
+              el.classList.add('text-blue-700', 'font-bold');
+            } else {
+              el.classList.remove('text-blue-700', 'font-bold');
+            }
+          });
+        });
+        kbjuActivitySlider.dispatchEvent(new Event('input'));
       }
     });
 
-    // Ініціалізація Telegram Web App
-    if (window.Telegram?.WebApp) {
-      window.Telegram.WebApp.ready();
-      window.Telegram.WebApp.expand();
+    // --- Навигация (фикс для открытия разделов) ---
+    function showSection(section) {
+      document.getElementById('mainMenu').classList.add('hidden');
+      document.getElementById('calorieCounterSection').classList.add('hidden');
+      document.getElementById('kbjuSection').classList.add('hidden');
+      document.getElementById('bodyFatSection').classList.add('hidden');
+      if (section === 'calorieCounter') document.getElementById('calorieCounterSection').classList.remove('hidden');
+      if (section === 'kbju') document.getElementById('kbjuSection').classList.remove('hidden');
+      if (section === 'bodyFat') document.getElementById('bodyFatSection').classList.remove('hidden');
     }
+
+    // --- Submit KBJU ---
+    document.getElementById('kbjuForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const gender = document.getElementById('kbjuGender').value;
+      const age = parseFloat(document.getElementById('kbjuAge').value);
+      const weight = parseFloat(document.getElementById('kbjuWeight').value);
+      const height = parseFloat(document.getElementById('kbjuHeight').value);
+      const activity = parseFloat(document.getElementById('kbjuActivity').value);
+      const goal = document.getElementById('kbjuGoal').value;
+      const fatPercent = parseFloat(document.getElementById('kbjuFatPercent').value);
+
+      if (isNaN(fatPercent) || fatPercent <= 0) {
+        document.getElementById('kbjuResult').innerHTML = '<p class="text-red-500">Будь ласка, введіть коректний % підшкірного жиру!</p>';
+        return;
+      }
+
+      let bmr;
+      if (gender === 'male') {
+        bmr = 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age);
+      } else {
+        bmr = 447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age);
+      }
+      let tdee = bmr * activity;
+
+      let protein, fat, carbs, kcal;
+      if (goal === 'lose') {
+        kcal = tdee - 400;
+      } else if (goal === 'gain') {
+        kcal = tdee + 400;
+      } else if (goal === 'recomp') {
+        kcal = tdee;
+      }
+
+      const leanMass = weight * (1 - fatPercent / 100);
+      protein = Math.round(leanMass * 2);
+      fat = Math.round(leanMass * 1);
+      carbs = Math.round((kcal - (protein * 4 + fat * 9)) / 4);
+
+      document.getElementById('kbjuResult').innerHTML = `
+        <div class="mb-2">Калорії: <span class="font-semibold">${Math.round(kcal)}</span></div>
+        <div class="mb-2">Білки: <span class="font-semibold">${protein} г</span></div>
+        <div class="mb-2">Жири: <span class="font-semibold">${fat} г</span></div>
+        <div class="mb-2">Вуглеводи: <span class="font-semibold">${carbs} г</span></div>
+      `;
+    });
+
+    // --- Процент жира ---
+    function setGender(gender) {
+      document.getElementById('gender').value = gender;
+      // Кнопки
+      document.getElementById('maleBtn').classList.toggle('active', gender === 'male');
+      document.getElementById('femaleBtn').classList.toggle('active', gender === 'female');
+      // Стили для женской кнопки
+      document.getElementById('femaleBtn').classList.toggle('female', true);
+      // Показать/скрыть hipSection
+      document.getElementById('hipSection').classList.toggle('hidden', gender === 'male');
+    }
+    document.getElementById('maleBtn').addEventListener('click', function() { setGender('male'); });
+    document.getElementById('femaleBtn').addEventListener('click', function() { setGender('female'); });
+    setGender('male');
   </script>
 </body>
 </html>
