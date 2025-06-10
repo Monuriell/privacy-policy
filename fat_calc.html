@@ -6,56 +6,107 @@
   <title>Калькулятор відсотка жиру</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    /* Анимированный градиентный фон */
+    body {
+      background: linear-gradient(-45deg, #a5b4fc, #f3e8ff, #f0abfc, #bae6fd, #c7d2fe, #f9fafb);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+    }
+    @keyframes gradientBG {
+      0% {background-position: 0% 50%;}
+      25% {background-position: 50% 100%;}
+      50% {background-position: 100% 50%;}
+      75% {background-position: 50% 0%;}
+      100% {background-position: 0% 50%;}
+    }
+  </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
-  <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-    <h1 class="text-2xl font-bold mb-4 text-center">Калькулятор відсотка жиру</h1>
+<body class="min-h-screen flex items-center justify-center">
+  <div class="backdrop-blur-lg bg-white/30 border border-white/40 shadow-2xl rounded-3xl p-8 w-full max-w-md"
+       style="box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);">
+    <h1 class="text-3xl font-extrabold mb-6 text-center text-gray-800 drop-shadow">Калькулятор відсотка жиру</h1>
     <div class="mb-4">
-      <label class="block text-sm font-medium text-gray-700">Стать</label>
-      <select id="gender" class="mt-1 block w-full p-2 border rounded">
-        <option value="male">Чоловік</option>
-        <option value="female">Жінка</option>
-      </select>
+      <label class="block text-sm font-medium text-gray-700 mb-2">Стать</label>
+      <div id="genderBtns" class="flex gap-4">
+        <button type="button" id="maleBtn" data-gender="male"
+          class="flex-1 py-2 rounded-lg border border-white/50 bg-white/80 backdrop-blur font-semibold text-blue-900 shadow transition focus:outline-none focus:ring-2 focus:ring-blue-300 ring-4"
+        >Чоловік</button>
+        <button type="button" id="femaleBtn" data-gender="female"
+          class="flex-1 py-2 rounded-lg border border-white/50 bg-white/40 backdrop-blur font-semibold text-pink-700 shadow transition focus:outline-none focus:ring-2 focus:ring-pink-300"
+        >Жінка</button>
+      </div>
+      <input type="hidden" id="gender" value="male">
+    </div>
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-gray-700">Вік (років)</label>
+      <input id="age" type="number" min="10" max="120" class="mt-1 block w-full p-2 border border-white/50 rounded-lg bg-white/40 backdrop-blur focus:outline-none focus:ring-2 focus:ring-blue-300" placeholder="Введіть вік">
+    </div>
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-gray-700">Вага (кг)</label>
+      <input id="weight" type="number" step="0.1" class="mt-1 block w-full p-2 border border-white/50 rounded-lg bg-white/40 backdrop-blur focus:outline-none focus:ring-2 focus:ring-blue-300" placeholder="Введіть вагу">
     </div>
     <div class="mb-4">
       <label class="block text-sm font-medium text-gray-700">Зріст (см)</label>
-      <input id="height" type="number" step="0.1" class="mt-1 block w-full p-2 border rounded" placeholder="Введіть зріст">
+      <input id="height" type="number" step="0.1" class="mt-1 block w-full p-2 border border-white/50 rounded-lg bg-white/40 backdrop-blur focus:outline-none focus:ring-2 focus:ring-blue-300" placeholder="Введіть зріст">
     </div>
     <div class="mb-4">
       <label class="block text-sm font-medium text-gray-700">Обхват талії (см)</label>
-      <input id="waist" type="number" step="0.1" class="mt-1 block w-full p-2 border rounded" placeholder="Введіть обхват талії">
+      <input id="waist" type="number" step="0.1" class="mt-1 block w-full p-2 border border-white/50 rounded-lg bg-white/40 backdrop-blur focus:outline-none focus:ring-2 focus:ring-blue-300" placeholder="Введіть обхват талії">
     </div>
     <div class="mb-4">
       <label class="block text-sm font-medium text-gray-700">Обхват шиї (см)</label>
-      <input id="neck" type="number" step="0.1" class="mt-1 block w-full p-2 border rounded" placeholder="Введіть обхват шиї">
+      <input id="neck" type="number" step="0.1" class="mt-1 block w-full p-2 border border-white/50 rounded-lg bg-white/40 backdrop-blur focus:outline-none focus:ring-2 focus:ring-blue-300" placeholder="Введіть обхват шиї">
     </div>
     <div id="hipSection" class="mb-4 hidden">
       <label class="block text-sm font-medium text-gray-700">Обхват стегон (см)</label>
-      <input id="hip" type="number" step="0.1" class="mt-1 block w-full p-2 border rounded" placeholder="Введіть обхват стегон">
+      <input id="hip" type="number" step="0.1" class="mt-1 block w-full p-2 border border-white/50 rounded-lg bg-white/40 backdrop-blur focus:outline-none focus:ring-2 focus:ring-blue-300" placeholder="Введіть обхват стегон">
     </div>
-    <button id="calculate" class="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Обчислити</button>
-    <div id="result" class="mt-4 text-center"></div>
+    <button id="calculate" class="w-full bg-white/60 text-blue-700 font-bold p-2 rounded-lg shadow hover:bg-white/80 transition">Обчислити</button>
+    <div id="result" class="mt-6 text-center"></div>
   </div>
 
   <script>
-    // Показати/приховати поле для стегон залежно від статі
-    document.getElementById('gender').addEventListener('change', function() {
-      const hipSection = document.getElementById('hipSection');
-      hipSection.classList.toggle('hidden', this.value === 'male');
-    });
+    // Кнопки выбора пола
+    function setGender(gender) {
+      document.getElementById('gender').value = gender;
+      document.getElementById('maleBtn').classList.toggle('ring-4', gender === 'male');
+      document.getElementById('maleBtn').classList.toggle('bg-white/80', gender === 'male');
+      document.getElementById('maleBtn').classList.toggle('text-blue-900', gender === 'male');
+      document.getElementById('maleBtn').classList.toggle('bg-white/40', gender !== 'male');
+      document.getElementById('maleBtn').classList.toggle('text-blue-700', gender !== 'male');
+      document.getElementById('femaleBtn').classList.toggle('ring-4', gender === 'female');
+      document.getElementById('femaleBtn').classList.toggle('bg-white/80', gender === 'female');
+      document.getElementById('femaleBtn').classList.toggle('text-pink-900', gender === 'female');
+      document.getElementById('femaleBtn').classList.toggle('bg-white/40', gender !== 'female');
+      document.getElementById('femaleBtn').classList.toggle('text-pink-700', gender !== 'female');
+      // Показать/скрыть поле бедер
+      document.getElementById('hipSection').classList.toggle('hidden', gender === 'male');
+    }
+    document.getElementById('maleBtn').addEventListener('click', () => setGender('male'));
+    document.getElementById('femaleBtn').addEventListener('click', () => setGender('female'));
+    setGender('male');
 
-    // Функція розрахунку відсотка жиру за формулою Navy
-    function calculateBodyFat(gender, height, waist, neck, hip) {
+    // Формула Navy (1)
+    function calculateBodyFatNavy(gender, height, waist, neck, hip) {
       let bodyFat;
       if (gender === 'male') {
         bodyFat = 495 / (1.0324 - 0.19077 * Math.log10(waist - neck) + 0.15456 * Math.log10(height)) - 450;
       } else {
         bodyFat = 495 / (1.29579 - 0.35004 * Math.log10(waist + hip - neck) + 0.22100 * Math.log10(height)) - 450;
       }
-      return Math.round(bodyFat * 10) / 10; // Округляємо до 1 знака після коми
+      return Math.round(bodyFat * 10) / 10;
     }
 
-    // Функція для визначення категорії відсотка жиру
+    // Формула Deurenberg (4)
+    function calculateBodyFatDeurenberg(gender, weight, height, age) {
+      const bmi = weight / Math.pow(height / 100, 2);
+      const sex = gender === 'male' ? 1 : 0;
+      const bodyFat = (1.20 * bmi) + (0.23 * age) - (10.8 * sex) - 5.4;
+      return Math.round(bodyFat * 10) / 10;
+    }
+
+    // Категории (по Navy)
     function getBodyFatCategory(gender, bodyFat) {
       if (bodyFat < 0) {
         return '<p class="text-red-500">Помилка: від’ємне значення. Можливо, параметри введено некоректно!</p>';
@@ -83,34 +134,44 @@
       }
     }
 
-    // Обробник кнопки
     document.getElementById('calculate').addEventListener('click', function() {
       const gender = document.getElementById('gender').value;
+      const age = parseFloat(document.getElementById('age').value);
+      const weight = parseFloat(document.getElementById('weight').value);
       const height = parseFloat(document.getElementById('height').value);
       const waist = parseFloat(document.getElementById('waist').value);
       const neck = parseFloat(document.getElementById('neck').value);
       const hip = parseFloat(document.getElementById('hip').value) || 0;
 
       // Валідація
-      if (!height || !waist || !neck || (gender === 'female' && !hip)) {
+      if (!age || !weight || !height || !waist || !neck || (gender === 'female' && !hip)) {
         document.getElementById('result').innerHTML = '<p class="text-red-500">Будь ласка, заповніть усі поля!</p>';
         return;
       }
 
-      const bodyFat = calculateBodyFat(gender, height, waist, neck, hip);
-      const resultMessage = getBodyFatCategory(gender, bodyFat);
-      document.getElementById('result').innerHTML = resultMessage;
-      
+      // 1. Navy
+      const bodyFatNavy = calculateBodyFatNavy(gender, height, waist, neck, hip);
+      // 2. Deurenberg
+      const bodyFatDeurenberg = calculateBodyFatDeurenberg(gender, weight, height, age);
+
+      let resultHtml = `
+        <div class="mb-2">
+          <span class="font-semibold">Navy:</span> ${bodyFatNavy}%<br>
+          ${getBodyFatCategory(gender, bodyFatNavy)}
+        </div>
+        <div class="mb-2">
+          <span class="font-semibold">Deurenberg:</span> ${bodyFatDeurenberg}%<br>
+          ${getBodyFatCategory(gender, bodyFatDeurenberg)}
+        </div>
+      `;
+      document.getElementById('result').innerHTML = resultHtml;
+
       // Інтеграція з Telegram Web App
       if (window.Telegram?.WebApp) {
         window.Telegram.WebApp.sendData(JSON.stringify({
-          bodyFat: bodyFat,
-          gender: gender,
-          height: height,
-          waist: waist,
-          neck: neck,
-          hip: hip,
-          category: resultMessage
+          navy: bodyFatNavy,
+          deurenberg: bodyFatDeurenberg,
+          gender, age, weight, height, waist, neck, hip
         }));
       }
     });
