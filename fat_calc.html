@@ -144,12 +144,12 @@
     #sectionsContainer {
       position: relative;
       min-height: 100vh;
-      width: 100vw;
+      width: 100%;
     }
   </style>
 </head>
-<body class="h-screen">
-  <div id="sectionsContainer" class="overflow-auto h-full pt-8 pb-8">
+<body class="h-screen overflow-x-hidden">
+  <div id="sectionsContainer" class="pt-8 pb-8 h-full overflow-auto overflow-x-hidden">
     <div id="mainMenu" class="w-full max-w-md flex flex-col gap-6 items-center px-2 section-anim section-active">
       <h1 class="text-3xl font-extrabold mb-2 text-center text-gray-800 drop-shadow">Fobosss Fitness</h1>
       <button onclick="showSection('calorieCounterSection')" class="w-full bg-white/60 text-blue-700 font-bold p-4 rounded-lg shadow hover:bg-white/80 transition">Лічильник калорій</button>
